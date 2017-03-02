@@ -107,7 +107,7 @@ func (e *Email) Send(m *Message) error {
 	return smtp.SendMail(e.address, e.Auth, m.From, strings.Split(m.To, ";"), m.buffer.Bytes())
 }
 
-
+// send email
 func Send(address, username, password string, m *Message) error {
 	e := New(address)
 	t := strings.Split(address, ":")

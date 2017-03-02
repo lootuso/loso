@@ -126,7 +126,7 @@ func (i *Ini) parse(reader io.Reader) error {
 	return nil
 }
 
-func NewIni(source string) (*Ini, error) {
+func New(source string) (*Ini, error) {
 	ini := &Ini{
 		storage: make(map[string]Value),
 	}
@@ -146,5 +146,45 @@ func NewIni(source string) (*Ini, error) {
 		} else {
 			return nil, err
 		}
+	}
+}
+
+var std *Ini
+
+// init global ini
+func Init(source string) error  {
+	var err error
+	std,err = New(source)
+	if err != nil{
+		return err
+	}
+}
+
+func Session(name string)Value  {
+	return std.Section(name)
+}
+
+func Interface(session, key string)interface{} {
+	if v,err := std.Get(session,key); err == nil{
+		return v
+	}
+	return nil
+}
+
+func String(session, key string) string {
+	v,err := std.String(session,key)
+	if err == nil{
+		return v
+	}else{
+		return ""
+	}
+}
+
+func Integer(session, key string) int {
+	v,err := std.Integer(session,key)
+	if err == nil{
+		return v
+	}else{
+		return ""
 	}
 }
