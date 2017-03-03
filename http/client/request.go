@@ -7,6 +7,11 @@ import (
 	"strings"
 )
 
+const (
+	METHOD_GET = "GET"
+	METHOD_POST = "POST"
+)
+
 func Request(urlStr string, data Param, method string, h http.Header) ([]byte, error) {
 	method = strings.ToUpper(method)
 	var body io.Reader = nil
