@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"losa/str"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
-	"losa/str"
 )
 
 var (
@@ -286,7 +286,7 @@ func (m *Model) Insert(v interface{}) (int64, error) {
 		m.table = m.parse.TableName(reflect.TypeOf(v))
 	}
 	keys, values := m.parseColumns(columns)
-	s := str.Replace("INSERT INTO %TABLE% SET %VALUES% ", map[string]string{
+	s := populateSql("INSERT INTO %TABLE% SET %VALUES% ", map[string]string{
 		"%TABLE%":  m.table,
 		"%VALUES%": keys,
 	})
@@ -314,7 +314,7 @@ func (m *Model) Update(v interface{}) (int64, error) {
 		m.table = m.parse.TableName(reflect.TypeOf(v))
 	}
 	keys, values := m.parseColumns(columns)
-	s := str.Replace("UPDATE %TABLE% SET %VALUES% %WHERE%%ORDER%%LIMIT%", map[string]string{
+	s := populateSql("UPDATE %TABLE% SET %VALUES% %WHERE%%ORDER%%LIMIT%", map[string]string{
 		"%TABLE%":  m.table,
 		"%VALUES%": keys,
 		"%WHERE%":  m.condition,
@@ -346,7 +346,7 @@ func (m *Model) Delete(v interface{}) (int64, error) {
 			m.table = m.parse.TableName(reflect.TypeOf(v))
 		}
 	}
-	s := str.Replace("DELETE FROM %TABLE% %WHERE%%ORDER%%LIMIT%", map[string]string{
+	s := populateSql("DELETE FROM %TABLE% %WHERE%%ORDER%%LIMIT%", map[string]string{
 		"%TABLE%": m.table,
 		"%WHERE%": m.condition,
 		"%ORDER%": m.orderBy,
@@ -452,7 +452,7 @@ func (m *Model) buildQuery() string {
 		"%ORDER%":    m.orderBy,
 		"%LIMIT%":    m.limit,
 	}
-	return str.Replace(s, replaceMap)
+	return populateSql(s, replaceMap)
 }
 
 func (m *Model) Query(str string, args ...interface{}) ([]map[string][]byte, error) {
@@ -541,6 +541,13 @@ func (m *Model) flush() {
 	m.params = make([]interface{}, 0)
 }
 
+//replace sql
+func populateSql(s string, pairs map[string]string) string {
+	for k, v := range pairs {
+		s = strings.Replace(s, k, v, 1)
+	}
+	return s
+}
 
 func New(db *sql.DB) *Model {
 	m := &Model{

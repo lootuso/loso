@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/smtp"
 	"strings"
+	"github.com/uole/gokit/random"
 )
 
 type (
@@ -72,7 +73,7 @@ func (e Email) generateBoundary(length int) string {
 
 func (e *Email) Send(m *Message) error {
 	m.buffer = new(bytes.Buffer)
-	m.boundary = e.generateBoundary(16)
+	m.boundary = random.String(16)
 	m.buffer.WriteString("MIME-Version: 1.0\r\n")
 	m.buffer.WriteString(fmt.Sprintf("TO: %s\r\n", m.To))
 	m.buffer.WriteString(fmt.Sprintf("CC: %s\r\n", m.CC))
